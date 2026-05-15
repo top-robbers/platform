@@ -23,19 +23,31 @@ export default defineConfig({
                 plugins: ['babel-plugin-react-compiler'],
             },
         }),
-        server: {
-            host: '0.0.0.0',
-                port: 5173,
-                origin: 'https://vite.top-robbers.test',
-                hmr: {
-                protocol: 'wss',
-                    host: 'vite.top-robbers.test',
-                    clientPort: 443,
-            },
-        },
         tailwindcss(),
         wayfinder({
             formVariants: true,
         }),
     ],
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        strictPort: true,
+
+        origin: 'https://vite.top-robbers.test',
+
+        cors: {
+            origin: 'https://top-robbers.test',
+            credentials: true,
+        },
+
+        hmr: {
+            protocol: 'wss',
+            host: 'vite.top-robbers.test',
+            clientPort: 443,
+        },
+
+        watch: {
+            usePolling: true,
+        },
+    },
 });

@@ -1,9 +1,11 @@
 name: "top-robbers-platform"
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+    image: top-robbers-platform-app
     container_name: top-robbers-platform
     working_dir: /var/www/html
     volumes:
@@ -35,15 +37,21 @@ services:
       - top-robbers
 
   node:
-    image: node:22-alpine
+    image: top-robbers-platform-app
     container_name: top-robbers-platform-node
     working_dir: /var/www/html
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
     ports:
       - "5173:5173"
     volumes:
       - .:/var/www/html
+      - vendor:/var/www/html/vendor
       - node_modules:/var/www/html/node_modules
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    depends_on:
+      - app
     networks:
       - top-robbers
 
@@ -87,7 +95,7 @@ networks:
 volumes:
   postgres_data:
   redis_data:
-  node_modules:
   vendor:
+  node_modules:
   caddy_data:
   caddy_config:

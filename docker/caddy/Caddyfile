@@ -1,0 +1,19 @@
+top-robbers.test {
+    tls internal
+
+    root * /var/www/html/public
+    php_fastcgi app:9000
+    file_server
+}
+
+vite.top-robbers.test {
+    tls internal
+
+    reverse_proxy node:5173
+}
+
+mail.top-robbers.test {
+    tls internal
+
+    reverse_proxy mailpit:8025
+}

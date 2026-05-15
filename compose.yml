@@ -1,0 +1,93 @@
+name: "top-robbers-platform"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: top-robbers-platform
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+      - vendor:/var/www/html/vendor
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - top-robbers
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: top-robbers-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/var/www/html
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+      - node
+      - mailpit
+    networks:
+      - top-robbers
+
+  node:
+    image: node:22-alpine
+    container_name: top-robbers-platform-node
+    working_dir: /var/www/html
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/var/www/html
+      - node_modules:/var/www/html/node_modules
+    networks:
+      - top-robbers
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: top-robbers-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: top_robbers
+      POSTGRES_USER: top_robbers
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - top-robbers
+
+  redis:
+    image: redis:7-alpine
+    container_name: top-robbers-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - top-robbers
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: top-robbers-mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - top-robbers
+
+networks:
+  top-robbers:
+    name: top-robbers
+
+volumes:
+  postgres_data:
+  redis_data:
+  node_modules:
+  vendor:
+  caddy_data:
+  caddy_config:

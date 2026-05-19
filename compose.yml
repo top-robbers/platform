@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: top-robbers-platform-app
-    container_name: top-robbers-platform
+    container_name: top-robbers_platform
     working_dir: /var/www/html
     volumes:
       - .:/var/www/html
@@ -20,7 +20,7 @@ services:
 
   caddy:
     image: caddy:2-alpine
-    container_name: top-robbers-caddy
+    container_name: top-robbers_caddy
     ports:
       - "80:80"
       - "443:443"
@@ -38,7 +38,7 @@ services:
 
   node:
     image: top-robbers-platform-app
-    container_name: top-robbers-platform-node
+    container_name: top-robbers_node
     working_dir: /var/www/html
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     environment:
@@ -57,7 +57,7 @@ services:
 
   postgres:
     image: postgres:17-alpine
-    container_name: top-robbers-postgres
+    container_name: top-robbers_postgres
     ports:
       - "5432:5432"
     environment:
@@ -71,7 +71,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: top-robbers-redis
+    container_name: top-robbers_redis
     ports:
       - "6379:6379"
     volumes:
@@ -79,9 +79,21 @@ services:
     networks:
       - top-robbers
 
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: top-robbers_redisinsight
+    ports:
+      - "5540:5540"
+    volumes:
+      - redisinsight-data:/data
+    depends_on:
+      - redis
+    networks:
+      - top-robbers
+      
   mailpit:
     image: axllent/mailpit:latest
-    container_name: top-robbers-mailpit
+    container_name: top-robbers_mailpit
     ports:
       - "8025:8025"
       - "1025:1025"
@@ -95,6 +107,7 @@ networks:
 volumes:
   postgres_data:
   redis_data:
+  redisinsight-data:
   vendor:
   node_modules:
   caddy_data:

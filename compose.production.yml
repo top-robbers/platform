@@ -1,0 +1,107 @@
+name: 'top-robbers-platform-production'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: app
+    image: top-robbers-platform-app:production
+    container_name: top-robbers_platform_app
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    volumes:
+      - platform_storage:/var/www/html/storage
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - top-robbers
+
+  queue:
+    image: top-robbers-platform-app:production
+    container_name: top-robbers_platform_queue
+    restart: unless-stopped
+    command: php artisan queue:work redis --sleep=3 --tries=3 --timeout=90
+    env_file:
+      - .env.production
+    volumes:
+      - platform_storage:/var/www/html/storage
+    depends_on:
+      - app
+      - postgres
+      - redis
+    networks:
+      - top-robbers
+
+  scheduler:
+    image: top-robbers-platform-app:production
+    container_name: top-robbers_platform_scheduler
+    restart: unless-stopped
+    command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"
+    env_file:
+      - .env.production
+    volumes:
+      - platform_storage:/var/www/html/storage
+    depends_on:
+      - app
+      - postgres
+      - redis
+    networks:
+      - top-robbers
+
+  caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      target: web
+    image: top-robbers-platform-web:production
+    container_name: top-robbers_platform_caddy
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    networks:
+      - top-robbers
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: top-robbers_platform_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - top-robbers
+
+  redis:
+    image: redis:7-alpine
+    container_name: top-robbers_platform_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - top-robbers
+
+networks:
+  top-robbers:
+    name: top-robbers-production
+
+volumes:
+  postgres_data:
+  redis_data:
+  platform_storage:
+  caddy_data:
+  caddy_config:

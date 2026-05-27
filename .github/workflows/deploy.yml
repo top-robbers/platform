@@ -1,0 +1,36 @@
+name: Deploy Platform
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"
+        required: true
+        default: "main"
+
+concurrency:
+  group: deploy-platform
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy platform to VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Prepare SSH key
+        shell: bash
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_PRIVATE_KEY }}" > ~/.ssh/top_robbers_deploy_key
+          chmod 600 ~/.ssh/top_robbers_deploy_key
+          ssh-keyscan -p "${{ secrets.VPS_PORT }}" "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy over SSH
+        shell: bash
+        run: |
+          ssh \
+            -i ~/.ssh/top_robbers_deploy_key \
+            -p "${{ secrets.VPS_PORT }}" \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "cd /opt/top-robbers/platform && ./scripts/deploy-production.sh '${{ inputs.branch }}'"

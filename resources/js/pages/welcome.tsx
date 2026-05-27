@@ -20,7 +20,7 @@ export default function Welcome() {
                                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#f0b429]" />
                             </span>
 
-                            The heist is loading ...
+                            Robbery in progress ...
                         </div>
 
                         <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-3xl border border-[#9083d2]/30 bg-[#211f2b] shadow-2xl shadow-[#9083d2]/10">

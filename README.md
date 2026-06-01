@@ -91,13 +91,13 @@ docker compose exec app php artisan migrate
 The application should now be available at:
 
 ```txt
-https://top-robbers.local
+https://top-robbers.test
 ```
 
 Mailpit is available at:
 
 ```txt
-https://mail.top-robbers.local
+https://mail.top-robbers.test
 ```
 
 ## Local HTTPS
@@ -107,9 +107,9 @@ This project uses a local reverse proxy with HTTPS support.
 Add the following entries to your system hosts file:
 
 ```txt
-127.0.0.1 top-robbers.local
-127.0.0.1 vite.top-robbers.local
-127.0.0.1 mail.top-robbers.local
+127.0.0.1 top-robbers.test
+127.0.0.1 vite.top-robbers.test
+127.0.0.1 mail.top-robbers.test
 ```
 
 On Windows, the hosts file is located at:

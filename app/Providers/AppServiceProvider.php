@@ -15,7 +15,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(\App\Services\SampQueryService::class, function () {
+            return new \App\Services\SampQueryService(
+                ip: config('app.samp_server_ip'),
+                port: (int) config('app.samp_server_port'),
+                timeoutSeconds: 5,
+            );
+        });
+        
+        $this->app->singleton(\App\Services\ServerStatusService::class);
     }
 
     /**

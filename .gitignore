@@ -28,3 +28,4 @@ yarn-error.log
 /.vscode
 /.zed
 /docker/caddy/certs
+/.bruno/environments

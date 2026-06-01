@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Account;
+use App\Observers\AccountObserver;
+
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+
+        Account::observe(AccountObserver::class);
     }
 
     /**

@@ -2,16 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use Database\Seeders\Authorization\PermissionSeeder;
+use Database\Seeders\Authorization\RoleSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // todo
+        $this->call([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            AccountSeeder::class,
+        ]);
     }
 }

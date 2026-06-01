@@ -20,21 +20,19 @@ class AuthController extends Controller
 
         $account = Account::query()
             ->where('email', $credentials['email'])
+            ->where('active', true)
             ->first();
 
-        if (!$account || !Hash::check($credentials['password'], $account->password)) {
+        if (! $account || ! Hash::check($credentials['password'], $account->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials.'],
             ]);
         }
 
-        if (!$account->active) {
-            return response()->json([
-                'message' => 'Account is not active.',
-            ], 403);
-        }
-
-        $token = $account->createToken('api')->plainTextToken;
+        $token = $account->createToken('launcher', [
+            'launcher:read',
+            'launcher:create-game-ticket',
+        ])->plainTextToken;
 
         return response()->json([
             'token_type' => 'Bearer',
@@ -54,7 +52,7 @@ class AuthController extends Controller
         return response()->json([
             'data' => [
                 'id' => $account->id,
-                'name' => $account->username,
+                'name' => $account->name,
                 'email' => $account->email,
                 'created_at' => $account->created_at?->toISOString(),
             ],

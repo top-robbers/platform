@@ -20,6 +20,8 @@ class PermissionSeeder extends Seeder
             'platform.accounts.update',
             'platform.accounts.delete',
 
+            'platform.permissions.view',
+            
             'platform.roles.view',
             'platform.roles.create',
             'platform.roles.update',

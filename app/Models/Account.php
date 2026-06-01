@@ -12,11 +12,24 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
+#[Fillable([
+    'name',
+    'email',
+    'password',
+    'active',
+])]
+#[Hidden([
+    'password',
+    'two_factor_secret',
+    'two_factor_recovery_codes',
+    'remember_token',
+])]
 class Account extends Authenticatable implements FilamentUser
 {
-    use Notifiable, TwoFactorAuthenticatable, HasApiTokens, HasRoles;
+    use HasApiTokens;
+    use HasRoles;
+    use Notifiable;
+    use TwoFactorAuthenticatable;
 
     public function isActive(): bool
     {
@@ -25,7 +38,7 @@ class Account extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        if (!$this->isActive()) {
+        if (! $this->isActive()) {
             return false;
         }
 
@@ -34,7 +47,7 @@ class Account extends Authenticatable implements FilamentUser
             default => false,
         };
     }
-    
+
     protected function casts(): array
     {
         return [

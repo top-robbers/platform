@@ -1,17 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\Accounts\Tables;
+namespace App\Filament\Resources\Roles\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class AccountsTable
+class RolesTable
 {
     public static function configure(Table $table): Table
     {
@@ -24,34 +22,18 @@ class AccountsTable
                 TextColumn::make('name')
                     ->label('Name')
                     ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('email')
-                    ->label('Email address')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('roles.name')
-                    ->label('Roles')
-                    ->badge()
-                    ->separator(', '),
-
-                IconColumn::make('active')
-                    ->label('Active')
-                    ->boolean()
-                    ->sortable(),
-
-                TextColumn::make('email_verified_at')
-                    ->label('Email verified at')
-                    ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->badge(),
 
-                TextColumn::make('two_factor_confirmed_at')
-                    ->label('2FA confirmed at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('permissions_count')
+                    ->label('Permissions')
+                    ->counts('permissions')
+                    ->sortable(),
+
+                TextColumn::make('users_count')
+                    ->label('Accounts')
+                    ->counts('users')
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Created at')
@@ -65,18 +47,16 @@ class AccountsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('id', 'desc')
-            ->filters([
-                //
-            ])
+            ->defaultSort('id')
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->visible(fn ($record): bool => ! in_array($record->name, ['owner', 'admin', 'moderator', 'helper', 'player'], true)),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    //
                 ]),
             ]);
     }

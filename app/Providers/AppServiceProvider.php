@@ -4,12 +4,14 @@ namespace App\Providers;
 
 use App\Models\Account;
 use App\Observers\AccountObserver;
-
+use App\Policies\RolePolicy;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Role;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
 
         Account::observe(AccountObserver::class);
+        Gate::policy(Role::class, RolePolicy::class);
     }
 
     /**
